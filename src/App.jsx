@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { saveTokenToLocalStorage } from "./actions";
 const fetchLoginApi = async ({ username, password }) => {
 	const response = await fetch("https://dummyjson.com/auth/login", {
 		method: "POST",
@@ -80,6 +81,12 @@ function App() {
 				});
 				return;
 			}
+			const { data } = result;
+			saveTokenToLocalStorage({
+				accessToken: data.accessToken,
+				refreshToken: data.refreshToken,
+			});
+
 			toast.success("Đăng nhập thành công!", {
 				closeOnClick: true,
 				pauseOnHover: false,
@@ -113,6 +120,17 @@ function App() {
 			password: "",
 		});
 	};
+
+	useEffect(() => {
+		const username = localStorage.getItem("username");
+		const password = localStorage.getItem("password");
+		if (username && password) {
+			setDataUser({
+				username,
+				password,
+			});
+		}
+	}, []);
 
 	return (
 		<div className="w-full h-screen bg-white">
